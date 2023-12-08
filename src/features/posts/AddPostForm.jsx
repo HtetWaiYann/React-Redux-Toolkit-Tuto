@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { postAdded } from "./postsSlice";
+import { addNewPost } from "./postsSlice";
 import { selectAllUsers } from "../users/usersSlice";
 
 const AddPostForm = () => {
@@ -8,6 +8,10 @@ const AddPostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userid, setUserid] = useState("");
+  const [addRequestStatus, setAddRequestStatus] = useState("idle");
+
+  const canSave =
+    [title, content, userid].every(Boolean) && addRequestStatus === "idle";
 
   const users = useSelector(selectAllUsers);
 
@@ -16,14 +20,20 @@ const AddPostForm = () => {
   const onAuthorChanged = (e) => setUserid(e.target.value);
 
   const onSavePostClicked = () => {
-    if (title && content && userid) {
-      dispatch(postAdded(title, content, userid));
-      setTitle("");
-      setContent("");
+    if (canSave) {
+      try {
+        setAddRequestStatus("pending");
+        dispatch(addNewPost({ title, body: content, userid })).unwrap();
+        setTitle("");
+        setContent("");
+        setUserid("");
+      } catch (err) {
+        console.error("Failed to save post.", err);
+      } finally {
+        setAddRequestStatus("idle");
+      }
     }
   };
-
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userid);
 
   const userOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
@@ -55,7 +65,7 @@ const AddPostForm = () => {
           value={content}
           onChange={onContentChanged}
         />
-        
+
         <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
           Save Post
         </button>

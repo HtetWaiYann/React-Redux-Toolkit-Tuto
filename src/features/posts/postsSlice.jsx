@@ -64,10 +64,22 @@ const postsSlice = createSlice({
           };
           return post;
         });
-        state.posts = state.posts.concat(loadedPosts);
+        state.posts = loadedPosts;
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = "failed";
+      })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        action.payload.userId = Number(action.payload.userid);
+        action.payload.date =  new Date().toISOString();
+        action.payload.reactions =  {
+          thumbsUp: 0,
+          wow: 0,
+          heart: 0,
+          rocket: 0,
+          coffee: 0,
+        };
+        state.posts.push(action.payload);
       })
   },
 });
@@ -75,15 +87,26 @@ const postsSlice = createSlice({
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
     const response = await axios.get(POST_URL);
-    return [...response.data];
+    return response.data;
   } catch (error) {
     return error.message;
   }
 });
 
+export const addNewPost = createAsyncThunk("posts/addNewPosts", async (initialPost) => {
+  try {
+    const response = await axios.post(POST_URL, initialPost);
+    return response.data;
+  } catch (error) {
+    return error.message;
+  }
+}); 
+
 export const selectAllPosts = (state) => state.posts.posts;
 export const getPostsStatus = (state) => state.posts.status;
 export const getPostsError = (state) => state.posts.error;
+
+export const selectPostById = (state, postid) => state.posts.posts.find(post => post.id === postid)
 
 export const { postAdded, reactionAdded } = postsSlice.actions;
 

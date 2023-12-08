@@ -10,10 +10,6 @@ import {
 import { useEffect } from "react";
 import PostExcerpt from "./PostExcerpt";
 
-import PostAuthor from "./PostAuthor";
-import TimeAgo from "./TimeAgo";
-import ReactionButtons from "./ReactionButtons";
-
 const PostsList = () => {
   const dispatch = useDispatch();
 
@@ -30,16 +26,7 @@ const PostsList = () => {
       .sort((a, b) => b.date.localeCompare(a.date));
 
     content = orderedPosts.map((post) => (
-      <article key={post.id}>
-        <h3>{post.title}</h3>
-        <p>{post.body.substring(0, 100)}</p>
-        <p className="postCredit">
-          <PostAuthor userid={post.userid} />
-          <TimeAgo timestamp={post.date} />
-        </p>
-        <ReactionButtons post={post} />
-      </article>
-      // <PostExcerpt key={post.id} post={post} />
+      <PostExcerpt key={post.id} post={post} />
     ));
   } else if (postsStatus === "failed") {
     content = <div>{postsError}</div>;
