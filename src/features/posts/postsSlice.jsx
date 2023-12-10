@@ -71,8 +71,8 @@ const postsSlice = createSlice({
       })
       .addCase(addNewPost.fulfilled, (state, action) => {
         action.payload.userId = Number(action.payload.userid);
-        action.payload.date =  new Date().toISOString();
-        action.payload.reactions =  {
+        action.payload.date = new Date().toISOString();
+        action.payload.reactions = {
           thumbsUp: 0,
           wow: 0,
           heart: 0,
@@ -81,6 +81,18 @@ const postsSlice = createSlice({
         };
         state.posts.push(action.payload);
       })
+      .addCase(updatePost.fulfilled, (state, action) => {
+        if (!action.payload.id) {
+          console.log("id not found. update error");
+          return;
+        }
+        const { id } = action.payload;
+        action.payload.date = new Date().toISOString();
+
+        const posts = state.posts.filter((post) => post.id !== id);
+        console.log(action.payload);
+        state.posts = [...posts, action.payload];
+      });
   },
 });
 
@@ -93,20 +105,37 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   }
 });
 
-export const addNewPost = createAsyncThunk("posts/addNewPosts", async (initialPost) => {
-  try {
-    const response = await axios.post(POST_URL, initialPost);
-    return response.data;
-  } catch (error) {
-    return error.message;
+export const addNewPost = createAsyncThunk(
+  "posts/addNewPosts",
+  async (initialPost) => {
+    try {
+      const response = await axios.post(POST_URL, initialPost);
+      return response.data;
+    } catch (error) {
+      return error.message;
+    }
   }
-}); 
+);
+
+export const updatePost = createAsyncThunk(
+  "posts/updatePost",
+  async (initialPost) => {
+    const { id } = initialPost;
+    try {
+      const response = await axios.put(`${POST_URL}/${id}`, initialPost);
+      return response.data;
+    } catch (error) {
+      return error.message;
+    }
+  }
+);
 
 export const selectAllPosts = (state) => state.posts.posts;
 export const getPostsStatus = (state) => state.posts.status;
 export const getPostsError = (state) => state.posts.error;
 
-export const selectPostById = (state, postid) => state.posts.posts.find(post => post.id === postid)
+export const selectPostById = (state, postid) =>
+  state.posts.posts.find((post) => post.id === postid);
 
 export const { postAdded, reactionAdded } = postsSlice.actions;
 
