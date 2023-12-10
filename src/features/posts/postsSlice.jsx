@@ -92,6 +92,15 @@ const postsSlice = createSlice({
         const posts = state.posts.filter((post) => post.id !== id);
         console.log(action.payload);
         state.posts = [...posts, action.payload];
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        if (!action.payload.id) {
+          console.log("id not found. update error");
+          return;
+        }
+        const { id } = action.payload;
+        const posts = state.posts.filter((post) => post.id !== id);
+        state.posts = posts;
       });
   },
 });
@@ -124,6 +133,23 @@ export const updatePost = createAsyncThunk(
     try {
       const response = await axios.put(`${POST_URL}/${id}`, initialPost);
       return response.data;
+    } catch (error) {
+      return error.message;
+    }
+  }
+);
+
+
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async (initialPost) => {
+    const { id } = initialPost;
+    try {
+      const response = await axios.delete(`${POST_URL}/${id}`, initialPost);
+      if (response.status === 200) {
+        return initialPost;
+      }
+      return `${response.status}: ${response.statusText}`;
     } catch (error) {
       return error.message;
     }
