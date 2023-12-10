@@ -6,6 +6,7 @@ import SinglePostPage from "./features/posts/SinglePostPage";
 import Layout from "./features/components/Layout";
 import { Routes, Route } from "react-router-dom";
 import EditPostForm from "./features/posts/EditPostForm";
+import UsersList from "./features/users/UsersList";
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
           <Route index element={<AddPostForm />} />
           <Route path=":postid" element={<SinglePostPage />} />
           <Route path="edit/:postid" element={<EditPostForm />} />
+        </Route>
+        <Route path="user">
+        <Route index element={<UsersList />} />
         </Route>
       </Route>
     </Routes>

@@ -32,11 +32,11 @@ const PostsList = () => {
     content = <div>{postsError}</div>;
   }
 
-  useEffect(() => {
-    if (postsStatus === "idle") {
-      dispatch(fetchPosts());
-    }
-  }, [postsStatus]);
+  // useEffect(() => {
+  //   if (postsStatus === "idle") {
+  //     dispatch(fetchPosts());
+  //   }
+  // }, [postsStatus]);
 
   return (
     <section>
