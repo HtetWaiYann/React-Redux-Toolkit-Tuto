@@ -1,10 +1,9 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  selectAllPosts,
+  selectPostIds,
   getPostsStatus,
   getPostsError,
-  fetchPosts,
 } from "./postsSlice";
 
 import { useEffect } from "react";
@@ -13,7 +12,7 @@ import PostExcerpt from "./PostExcerpt";
 const PostsList = () => {
   const dispatch = useDispatch();
 
-  const posts = useSelector(selectAllPosts);
+  const orderedPostsId = useSelector(selectPostIds);
   const postsStatus = useSelector(getPostsStatus);
   const postsError = useSelector(getPostsError);
 
@@ -21,12 +20,9 @@ const PostsList = () => {
   if (postsStatus === "loading") {
     content = <div className="loader">Loading...</div>;
   } else if (postsStatus === "succeeded") {
-    const orderedPosts = posts
-      .slice()
-      .sort((a, b) => b.date.localeCompare(a.date));
 
-    content = orderedPosts.map((post) => (
-      <PostExcerpt key={post.id} post={post} />
+    content = orderedPostsId.map((postId) => (
+      <PostExcerpt key={postId} postId={postId} />
     ));
   } else if (postsStatus === "failed") {
     content = <div>{postsError}</div>;
